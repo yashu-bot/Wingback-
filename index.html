@@ -3,36 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wingback — Flight Compensation Made Simple</title>
+<title>Wingback</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; color: #1e293b; background: #f8fafc; }
-  nav { display: flex; flex-direction: column; align-items: center; padding: 14px 4%; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 10; gap: 8px; }
-  .logo { font-size: 20px; font-weight: 800; color: #0f172a; }
+  body { font-family: sans-serif; color: #1e293b; background: #f8fafc; }
+  nav { display: flex; flex-direction: column; align-items: center; padding: 14px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); gap: 8px; }
+  .logo { font-size: 20px; font-weight: 800; }
   .logo span { color: #2563eb; }
-  .nav-links { display: flex; gap: 16px; font-size: 13px; font-weight: 600; color: #475569; flex-wrap: wrap; justify-content: center; }
-  .nav-links a { text-decoration: none; color: inherit; }
-  .hero { background: linear-gradient(135deg, #0f172a, #1e3a8a); color: #fff; text-align: center; padding: 60px 6% 90px; }
-  .hero h1 { font-size: 30px; font-weight: 800; max-width: 650px; margin: 0 auto 14px; line-height: 1.3; }
-  .hero p { color: #cbd5e1; max-width: 500px; margin: 0 auto 30px; font-size: 15px; }
+  .nav-links { display: flex; gap: 16px; font-size: 13px; font-weight: 600; }
+  .nav-links a { text-decoration: none; color: #475569; }
+  .hero { background: #0f172a; color: #fff; text-align: center; padding: 60px 6% 90px; }
+  .hero h1 { font-size: 28px; font-weight: 800; max-width: 600px; margin: 0 auto 14px; }
+  .hero p { color: #cbd5e1; max-width: 480px; margin: 0 auto 30px; }
   .cta-btn { background: #2563eb; color: #fff; border: none; padding: 15px 34px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .trust-bar { background: #fff; display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; padding: 24px 6%; margin-top: -35px; max-width: 900px; margin-left: auto; margin-right: auto; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
-  .trust-item { text-align: center; }
-  .trust-num { font-size: 20px; font-weight: 800; color: #2563eb; }
-  .trust-label { font-size: 12px; color: #64748b; }
-  section { padding: 60px 6%; max-width: 1000px; margin: 0 auto; }
-  .section-title { text-align: center; font-size: 26px; font-weight: 800; margin-bottom: 40px; }
-  .steps { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
-  .step { background: #fff; border-radius: 16px; padding: 28px; flex: 1; min-width: 220px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-top: 4px solid #2563eb; }
-  .step-num { font-size: 28px; font-weight: 800; color: #2563eb; margin-bottom: 10px; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
-  .service-card { background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
-  .fee-banner { background: #eff6ff; border-radius: 16px; padding: 30px; text-align: center; border: 1px solid #bfdbfe; }
-  form { background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 460px; margin: 0 auto; }
-  input, select { width: 100%; padding: 13px; margin-bottom: 12px; border-radius: 9px; border: 1px solid #cbd5e1; font-size: 14px; }
-  button.submit { width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 9px; font-weight: 700; cursor: pointer; }
+  section { padding: 50px 6%; max-width: 900px; margin: 0 auto; }
+  .section-title { text-align: center; font-size: 24px; font-weight: 800; margin-bottom: 30px; }
+  form { background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 440px; margin: 0 auto; }
+  input, select { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
+  button.submit { width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+  button.submit:disabled { background: #94a3b8; cursor: not-allowed; }
   #result { margin-top: 14px; text-align: center; font-weight: 700; color: #16a34a; }
-  footer { background: #0f172a; color: #94a3b8; text-align: center; padding: 30px; font-size: 13px; }
+  footer { background: #0f172a; color: #94a3b8; text-align: center; padding: 24px; font-size: 12px; }
 </style>
 </head>
 <body>
@@ -40,46 +32,15 @@
 <nav>
   <div class="logo">Wing<span>back</span></div>
   <div class="nav-links">
-    <a href="#how">How It Works</a>
-    <a href="#services">Your Rights</a>
     <a href="#form">Check My Claim</a>
   </div>
 </nav>
 
 <div class="hero">
   <h1>Flight delayed, cancelled, or denied boarding?</h1>
-  <p>You could be owed up to ₹20,000 per passenger under DGCA rules. We fight for it — you don't lift a finger.</p>
+  <p>You could be owed up to ₹20,000. We fight for it — you don't lift a finger.</p>
   <button class="cta-btn" type="button" id="scrollBtn">Check My Compensation</button>
 </div>
-
-<div class="trust-bar">
-  <div class="trust-item"><div class="trust-num">0</div><div class="trust-label">Cases Filed</div></div>
-  <div class="trust-item"><div class="trust-num">15%</div><div class="trust-label">Our Fee</div></div>
-  <div class="trust-item"><div class="trust-num">No Win</div><div class="trust-label">No Fee</div></div>
-</div>
-
-<section id="how">
-  <div class="section-title">How it works</div>
-  <div class="steps">
-    <div class="step"><div class="step-num">1</div><h3>Submit your details</h3><p>Takes under 2 minutes.</p></div>
-    <div class="step"><div class="step-num">2</div><h3>We file and follow up</h3><p>We draft, send, and track your claim.</p></div>
-    <div class="step"><div class="step-num">3</div><h3>You get paid</h3><p>Airline pays you. We take our fee after.</p></div>
-  </div>
-</section>
-
-<section id="services">
-  <div class="section-title">What happened to your flight?</div>
-  <div class="cards">
-    <div class="service-card"><h4>Cancelled Flight</h4><p>Owed ₹5,000–₹10,000 if cancelled under 24hrs notice.</p></div>
-    <div class="service-card"><h4>Delayed Flight</h4><p>6+ hour delay = alternate flight or refund.</p></div>
-    <div class="service-card"><h4>Denied Boarding</h4><p>Bumped? Up to ₹20,000.</p></div>
-    <div class="service-card"><h4>Baggage Delay</h4><p>Lost/delayed baggage may qualify.</p></div>
-  </div>
-</section>
-
-<section>
-  <div class="fee-banner"><p>We only get paid when you do. Standard fee: <strong>15%</strong> of your compensation.</p></div>
-</section>
 
 <section id="form">
   <div class="section-title">Check Your Compensation</div>
@@ -98,12 +59,12 @@
       <option value="baggage">Baggage Delay/Loss</option>
     </select>
     <input id="price" type="number" placeholder="Ticket Price (₹)" required>
-    <button class="submit" type="submit">Check My Compensation</button>
+    <button class="submit" type="submit" id="submitBtn">Check My Compensation</button>
   </form>
   <div id="result"></div>
 </section>
 
-<footer>© 2026 Wingback · Terms · Privacy</footer>
+<footer>© 2026 Wingback</footer>
 
 <script>
   document.getElementById("scrollBtn").addEventListener("click", function() {
@@ -119,20 +80,23 @@
 
   document.getElementById("claimForm").addEventListener("submit", async function(e) {
     e.preventDefault();
-    document.querySelector("button.submit").disabled = true;
-    document.querySelector("button.submit").innerText = "Processing...";
+    var btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.innerText = "Processing...";
 
-    const eventType = document.getElementById("event").value;
-    const price = parseFloat(document.getElementById("price").value);
-    const compensation = checkEligibility(eventType, price);
+    var eventType = document.getElementById("event").value;
+    var price = parseFloat(document.getElementById("price").value);
+    var compensation = checkEligibility(eventType, price);
 
     document.getElementById("result").innerText = compensation > 0
       ? "You may be eligible for ₹" + compensation + ". We'll take it from here."
       : "You're eligible for meal/refund entitlements. We'll file this for you.";
 
     try {
-      const { createClient } = supabase;
-      const client = createClient("https://qdaaampcezgqfzfjikin.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYWFhbXBjZXpncWZ6Zmppa2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzE2NTksImV4cCI6MjEwNTkwNzY1OX0.pEWzMyDZFgcHbUSw3_bOvXUKX6C4icD6-pjlt_VsNKA");
+      var client = window.supabase.createClient(
+        "https://qdaaampcezgqfzfjikin.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYWFhbXBjZXpncWZ6Zmppa2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzE2NTksImV4cCI6MjEwNTkwNzY1OX0.pEWzMyDZFgcHbUSw3_bOvXUKX6C4icD6-pjlt_VsNKA;
+      );
       await client.from("claims").insert({
         passenger_name: document.getElementById("name").value,
         email: document.getElementById("email").value,
@@ -150,7 +114,10 @@
     } catch (err) {
       console.error("Supabase save failed:", err);
     }
-});
 
- 
-      
+    btn.disabled = false;
+    btn.innerText = "Check My Compensation";
+  });
+</script>
+</body>
+</html>
