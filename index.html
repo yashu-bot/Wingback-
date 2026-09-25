@@ -4,83 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wingback — Flight Compensation Made Simple</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; color: #1e293b; background: #f8fafc; }
-  a { text-decoration: none; color: inherit; }
-
-  nav {
-    display: flex; flex-direction: column; align-items: center;
-    padding: 14px 4%; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    position: sticky; top: 0; z-index: 10; gap: 8px;
-  }
+  nav { display: flex; flex-direction: column; align-items: center; padding: 14px 4%; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 10; gap: 8px; }
   .logo { font-size: 20px; font-weight: 800; color: #0f172a; }
   .logo span { color: #2563eb; }
-  .nav-links {
-    display: flex; gap: 16px; font-size: 13px; font-weight: 600;
-    color: #475569; flex-wrap: wrap; justify-content: center;
-  }
-
-  .hero {
-    background: linear-gradient(135deg, #0f172a, #1e3a8a);
-    color: #fff; text-align: center; padding: 60px 6% 90px; position: relative; overflow: hidden;
-  }
-  .hero::before {
-    content: "✈"; position: absolute; font-size: 300px; opacity: 0.06;
-    right: -40px; top: -40px; transform: rotate(30deg);
-  }
-  .hero h1 { font-size: 30px; font-weight: 800; max-width: 650px; margin: 0 auto 14px; line-height: 1.3; position: relative; }
-  .hero p { color: #cbd5e1; max-width: 500px; margin: 0 auto 30px; font-size: 15px; position: relative; }
-  .cta-btn {
-    background: #2563eb; color: #fff; border: none; padding: 15px 34px;
-    border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 10px 25px rgba(37,99,235,0.4); position: relative;
-  }
-
-  .trust-bar {
-    background: #fff; display: flex; justify-content: center; flex-wrap: wrap;
-    gap: 40px; padding: 24px 6%; margin-top: -35px; max-width: 900px;
-    margin-left: auto; margin-right: auto; border-radius: 16px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.1); position: relative;
-  }
+  .nav-links { display: flex; gap: 16px; font-size: 13px; font-weight: 600; color: #475569; flex-wrap: wrap; justify-content: center; }
+  .nav-links a { text-decoration: none; color: inherit; }
+  .hero { background: linear-gradient(135deg, #0f172a, #1e3a8a); color: #fff; text-align: center; padding: 60px 6% 90px; }
+  .hero h1 { font-size: 30px; font-weight: 800; max-width: 650px; margin: 0 auto 14px; line-height: 1.3; }
+  .hero p { color: #cbd5e1; max-width: 500px; margin: 0 auto 30px; font-size: 15px; }
+  .cta-btn { background: #2563eb; color: #fff; border: none; padding: 15px 34px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .trust-bar { background: #fff; display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; padding: 24px 6%; margin-top: -35px; max-width: 900px; margin-left: auto; margin-right: auto; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
   .trust-item { text-align: center; }
   .trust-num { font-size: 20px; font-weight: 800; color: #2563eb; }
-  .trust-label { font-size: 12px; color: #64748b; margin-top: 2px; }
-
+  .trust-label { font-size: 12px; color: #64748b; }
   section { padding: 60px 6%; max-width: 1000px; margin: 0 auto; }
-  .section-title { text-align: center; font-size: 26px; font-weight: 800; margin-bottom: 40px; color: #0f172a; }
-
+  .section-title { text-align: center; font-size: 26px; font-weight: 800; margin-bottom: 40px; }
   .steps { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
-  .step {
-    background: #fff; border-radius: 16px; padding: 28px; flex: 1; min-width: 220px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-top: 4px solid #2563eb;
-  }
+  .step { background: #fff; border-radius: 16px; padding: 28px; flex: 1; min-width: 220px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-top: 4px solid #2563eb; }
   .step-num { font-size: 28px; font-weight: 800; color: #2563eb; margin-bottom: 10px; }
-  .step h3 { font-size: 16px; margin-bottom: 8px; }
-  .step p { font-size: 13px; color: #64748b; line-height: 1.5; }
-
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
-  .service-card {
-    background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-    transition: transform 0.2s;
-  }
-  .service-card:hover { transform: translateY(-4px); }
-  .service-icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card h4 { font-size: 15px; margin-bottom: 6px; }
-  .service-card p { font-size: 13px; color: #64748b; line-height: 1.5; }
-
-  .fee-banner {
-    background: #eff6ff; border-radius: 16px; padding: 30px; text-align: center;
-    border: 1px solid #bfdbfe;
-  }
-  .fee-banner strong { color: #2563eb; }
-
+  .service-card { background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+  .fee-banner { background: #eff6ff; border-radius: 16px; padding: 30px; text-align: center; border: 1px solid #bfdbfe; }
   form { background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 460px; margin: 0 auto; }
   input, select { width: 100%; padding: 13px; margin-bottom: 12px; border-radius: 9px; border: 1px solid #cbd5e1; font-size: 14px; }
   button.submit { width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 9px; font-weight: 700; cursor: pointer; }
   #result { margin-top: 14px; text-align: center; font-weight: 700; color: #16a34a; }
-
   footer { background: #0f172a; color: #94a3b8; text-align: center; padding: 30px; font-size: 13px; }
 </style>
 </head>
@@ -102,7 +53,7 @@
 </div>
 
 <div class="trust-bar">
-  <div class="trust-item"><div class="trust-num" id="solvedCount">0</div><div class="trust-label">Cases Filed</div></div>
+  <div class="trust-item"><div class="trust-num">0</div><div class="trust-label">Cases Filed</div></div>
   <div class="trust-item"><div class="trust-num">15%</div><div class="trust-label">Our Fee</div></div>
   <div class="trust-item"><div class="trust-num">No Win</div><div class="trust-label">No Fee</div></div>
 </div>
@@ -110,26 +61,24 @@
 <section id="how">
   <div class="section-title">How it works</div>
   <div class="steps">
-    <div class="step"><div class="step-num">1</div><h3>Submit your details</h3><p>Takes under 2 minutes — flight number, PNR, and what happened.</p></div>
-    <div class="step"><div class="step-num">2</div><h3>We file and follow up</h3><p>We draft your claim, send it to the airline, and track every deadline.</p></div>
-    <div class="step"><div class="step-num">3</div><h3>You get paid</h3><p>Airline pays you directly. We only take our fee once you're paid.</p></div>
+    <div class="step"><div class="step-num">1</div><h3>Submit your details</h3><p>Takes under 2 minutes.</p></div>
+    <div class="step"><div class="step-num">2</div><h3>We file and follow up</h3><p>We draft, send, and track your claim.</p></div>
+    <div class="step"><div class="step-num">3</div><h3>You get paid</h3><p>Airline pays you. We take our fee after.</p></div>
   </div>
 </section>
 
 <section id="services">
   <div class="section-title">What happened to your flight?</div>
   <div class="cards">
-    <div class="service-card"><div class="service-icon">🛫</div><h4>Cancelled Flight</h4><p>Cancelled with less than 24 hours' notice? You may be owed ₹5,000–₹10,000.</p></div>
-    <div class="service-card"><div class="service-icon">⏱</div><h4>Delayed Flight</h4><p>6+ hour delay entitles you to an alternate flight or full refund.</p></div>
-    <div class="service-card"><div class="service-icon">🎫</div><h4>Denied Boarding</h4><p>Bumped due to overbooking? Compensation up to ₹20,000.</p></div>
-    <div class="service-card"><div class="service-icon">🧳</div><h4>Baggage Delay</h4><p>Lost or delayed baggage may qualify for compensation.</p></div>
+    <div class="service-card"><h4>Cancelled Flight</h4><p>Owed ₹5,000–₹10,000 if cancelled under 24hrs notice.</p></div>
+    <div class="service-card"><h4>Delayed Flight</h4><p>6+ hour delay = alternate flight or refund.</p></div>
+    <div class="service-card"><h4>Denied Boarding</h4><p>Bumped? Up to ₹20,000.</p></div>
+    <div class="service-card"><h4>Baggage Delay</h4><p>Lost/delayed baggage may qualify.</p></div>
   </div>
 </section>
 
 <section>
-  <div class="fee-banner">
-    <p style="font-size:15px;">We only get paid when you do. Our standard fee is <strong>15% of your compensation</strong> — nothing upfront, nothing if we don't win.</p>
-  </div>
+  <div class="fee-banner"><p>We only get paid when you do. Standard fee: <strong>15%</strong> of your compensation.</p></div>
 </section>
 
 <section id="form">
@@ -154,53 +103,52 @@
   <div id="result"></div>
 </section>
 
-<footer>© 2026 Wingback · Terms · Privacy · Governed by DGCA CAR Series M, Part IV</footer>
+<footer>© 2026 Wingback · Terms · Privacy</footer>
 
 <script>
-  const supabase = window.supabase.createClient("https://qdaaampcezgqfzfjikin.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYWFhbXBjZXpncWZ6Zmppa2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzE2NTksImV4cCI6MjEwNTkwNzY1OX0.pEWzMyDZFgcHbUSw3_bOvXUKX6C4icD6-pjlt_VsNKA");
-
   document.getElementById("scrollBtn").addEventListener("click", function() {
     document.getElementById("form").scrollIntoView({ behavior: "smooth" });
   });
 
-  function animateCount(id, target) {
-    let el = document.getElementById(id), count = 0;
-    const step = Math.max(1, Math.ceil(target / 60));
-    const t = setInterval(() => { count += step; if (count >= target) { count = target; clearInterval(t);} el.innerText = count; }, 25);
-  }
-  animateCount("solvedCount", 0);
-
   function checkEligibility(eventType, price) {
-    if (eventType === "cancellation") return { compensation: Math.min(Math.max(price * 0.5, 5000), 10000) };
-    if (eventType === "denied_boarding") return { compensation: 20000 };
-    if (eventType === "baggage") return { compensation: 5000 };
-    return { compensation: 0 };
+    if (eventType === "cancellation") return Math.min(Math.max(price * 0.5, 5000), 10000);
+    if (eventType === "denied_boarding") return 20000;
+    if (eventType === "baggage") return 5000;
+    return 0;
   }
 
-  document.getElementById("claimForm").addEventListener("submit", async (e) => {
+  document.getElementById("claimForm").addEventListener("submit", async function(e) {
     e.preventDefault();
     const eventType = document.getElementById("event").value;
     const price = parseFloat(document.getElementById("price").value);
-    const result = checkEligibility(eventType, price);
-    document.getElementById("result").innerText = result.compensation > 0
-      ? `You may be eligible for ₹${result.compensation}. We'll take it from here.`
-      : `You're eligible for meal/refund entitlements. We'll file this for you.`;
+    const compensation = checkEligibility(eventType, price);
 
-    await supabase.from("claims").insert({
-      passenger_name: document.getElementById("name").value,
-      email: document.getElementById("email").value,
-      phone: document.getElementById("phone").value,
-      pnr: document.getElementById("pnr").value,
-      flight_no: document.getElementById("flight").value,
-      airline: document.getElementById("airline").value,
-      travel_date: document.getElementById("date").value,
-      event_type: eventType,
-      ticket_price: price,
-      eligible: true,
-      compensation: result.compensation,
-      status: "new"
-    });
+    document.getElementById("result").innerText = compensation > 0
+      ? "You may be eligible for ₹" + compensation + ". We'll take it from here."
+      : "You're eligible for meal/refund entitlements. We'll file this for you.";
+
+    try {
+      const { createClient } = supabase;
+      const client = createClient("https://qdaaampcezgqfzfjikin.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYWFhbXBjZXpncWZ6Zmppa2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzE2NTksImV4cCI6MjEwNTkwNzY1OX0.pEWzMyDZFgcHbUSw3_bOvXUKX6C4icD6-pjlt_VsNKA");
+      await client.from("claims").insert({
+        passenger_name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        pnr: document.getElementById("pnr").value,
+        flight_no: document.getElementById("flight").value,
+        airline: document.getElementById("airline").value,
+        travel_date: document.getElementById("date").value,
+        event_type: eventType,
+        ticket_price: price,
+        eligible: true,
+        compensation: compensation,
+        status: "new"
+      });
+    } catch (err) {
+      console.error("Supabase save failed:", err);
+    }
   });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
