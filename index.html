@@ -1,74 +1,209 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Wingback — Get Your Flight Compensation</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body style="font-family: sans-serif; max-width: 500px; margin: 40px auto;">
-  <h1>Wingback</h1>
-  <p>Flight delayed or cancelled? Check what you're owed — free.</p>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wingback — Get Your Flight Compensation</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e3a5f);
+    color: #fff;
+    min-height: 100vh;
+  }
+  header {
+    text-align: center;
+    padding: 50px 20px 30px;
+  }
+  .logo {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+  .logo span { color: #38bdf8; }
+  .tagline {
+    color: #94a3b8;
+    margin-top: 8px;
+    font-size: 15px;
+  }
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 30px auto;
+    max-width: 500px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 16px 22px;
+    text-align: center;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-4px); }
+  .stat-num {
+    font-size: 24px;
+    font-weight: 800;
+    color: #38bdf8;
+  }
+  .stat-label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
+  .card {
+    max-width: 460px;
+    margin: 10px auto 60px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+  }
+  input, select {
+    width: 100%;
+    padding: 13px 14px;
+    margin-bottom: 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.07);
+    color: #fff;
+    font-size: 14px;
+  }
+  input::placeholder { color: #94a3b8; }
+  input:focus, select:focus { outline: none; border-color: #38bdf8; }
+  button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(56,189,248,0.35);
+    transition: transform 0.15s;
+  }
+  button:active { transform: scale(0.97); }
+  #result {
+    margin-top: 18px;
+    font-weight: 600;
+    text-align: center;
+    color: #4ade80;
+  }
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Wing<span>back</span></div>
+  <div class="tagline">Flight delayed or cancelled? You're probably owed money. We get it for you — free unless we win.</div>
+</header>
+
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-num" id="solvedCount">0</div>
+    <div class="stat-label">Cases Solved</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" id="totalCount">0</div>
+    <div class="stat-label">Cases Filed</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">15%</div>
+    <div class="stat-label">Our Fee</div>
+  </div>
+</div>
+
+<div class="card">
   <form id="claimForm">
-    <input id="name" placeholder="Full Name" required><br><br>
-    <input id="email" placeholder="Email" required><br><br>
-    <input id="phone" placeholder="Phone"><br><br>
-    <input id="pnr" placeholder="PNR Number" required><br><br>
-    <input id="flight" placeholder="Flight Number" required><br><br>
-    <input id="airline" placeholder="Airline" required><br><br>
-    <input id="date" type="date" required><br><br>
+    <input id="name" placeholder="Full Name" required>
+    <input id="email" placeholder="Email" required>
+    <input id="phone" placeholder="Phone">
+    <input id="pnr" placeholder="PNR Number" required>
+    <input id="flight" placeholder="Flight Number" required>
+    <input id="airline" placeholder="Airline" required>
+    <input id="date" type="date" required>
     <select id="event">
       <option value="delay">Delayed</option>
       <option value="cancellation">Cancelled</option>
       <option value="denied_boarding">Denied Boarding</option>
-    </select><br><br>
-    <input id="price" type="number" placeholder="Ticket Price (₹)" required><br><br>
+    </select>
+    <input id="price" type="number" placeholder="Ticket Price (₹)" required>
     <button type="submit">Check My Compensation</button>
   </form>
+  <div id="result"></div>
+</div>
 
-  <div id="result" style="margin-top:20px; font-weight:bold;"></div>
+<footer>© 2026 Wingback · Terms · Privacy · No win, no fee.</footer>
 
-  <script>
-    const supabase = window.supabase.createClient(
-      "https://qdaaampcezgqfzfjikin.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYWFhbXBjZXpncWZ6Zmppa2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzE2NTksImV4cCI6MjEwNTkwNzY1OX0.pEWzMyDZFgcHbUSw3_bOvXUKX6C4icD6-pjlt_VsNKA"
-    );
+<script>
+  const supabase = window.supabase.createClient(
+    "https://qdaaampcezgqfzfjikin.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYWFhbXBjZXpncWZ6Zmppa2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzE2NTksImV4cCI6MjEwNTkwNzY1OX0.pEWzMyDZFgcHbUSw3_bOvXUKX6C4icD6-pjlt_VsNKA"
+  );
 
-    function checkEligibility(eventType, price) {
-      if (eventType === "cancellation") {
-        return { eligible: true, compensation: Math.min(Math.max(price * 0.5, 5000), 10000) };
-      }
-      if (eventType === "denied_boarding") {
-        return { eligible: true, compensation: 20000 };
-      }
-      return { eligible: true, compensation: 0 };
+  // Animated counter — replace these numbers with real ones from Supabase once you have data
+  function animateCount(id, target) {
+    let el = document.getElementById(id);
+    let count = 0;
+    const step = Math.max(1, Math.ceil(target / 60));
+    const timer = setInterval(() => {
+      count += step;
+      if (count >= target) { count = target; clearInterval(timer); }
+      el.innerText = count;
+    }, 25);
+  }
+  animateCount("solvedCount", 0);   // update to real solved count later
+  animateCount("totalCount", 0);    // update to real filed count later
+
+  function checkEligibility(eventType, price) {
+    if (eventType === "cancellation") {
+      return { eligible: true, compensation: Math.min(Math.max(price * 0.5, 5000), 10000) };
     }
+    if (eventType === "denied_boarding") {
+      return { eligible: true, compensation: 20000 };
+    }
+    return { eligible: true, compensation: 0 };
+  }
 
-    document.getElementById("claimForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const eventType = document.getElementById("event").value;
-      const price = parseFloat(document.getElementById("price").value);
-      const result = checkEligibility(eventType, price);
+  document.getElementById("claimForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const eventType = document.getElementById("event").value;
+    const price = parseFloat(document.getElementById("price").value);
+    const result = checkEligibility(eventType, price);
 
-      document.getElementById("result").innerText =
-        result.compensation > 0
-          ? `You may be eligible for ₹${result.compensation}. We'll take it from here.`
-          : `You're eligible for meals/refund entitlements. We'll file this for you.`;
+    document.getElementById("result").innerText =
+      result.compensation > 0
+        ? `You may be eligible for ₹${result.compensation}. We'll take it from here.`
+        : `You're eligible for meals/refund entitlements. We'll file this for you.`;
 
-      await supabase.from("claims").insert({
-        passenger_name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
-        pnr: document.getElementById("pnr").value,
-        flight_no: document.getElementById("flight").value,
-        airline: document.getElementById("airline").value,
-        travel_date: document.getElementById("date").value,
-        event_type: eventType,
-        ticket_price: price,
-        eligible: result.eligible,
-        compensation: result.compensation,
-        status: "new"
-      });
+    await supabase.from("claims").insert({
+      passenger_name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      phone: document.getElementById("phone").value,
+      pnr: document.getElementById("pnr").value,
+      flight_no: document.getElementById("flight").value,
+      airline: document.getElementById("airline").value,
+      travel_date: document.getElementById("date").value,
+      event_type: eventType,
+      ticket_price: price,
+      eligible: result.eligible,
+      compensation: result.compensation,
+      status: "new"
     });
-  </script>
+  });
+</script>
 </body>
 </html>
