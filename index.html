@@ -11,28 +11,31 @@
   a { text-decoration: none; color: inherit; }
 
   nav {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 18px 6%; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    position: sticky; top: 0; z-index: 10;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 14px 4%; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: sticky; top: 0; z-index: 10; gap: 8px;
   }
-  .logo { font-size: 22px; font-weight: 800; color: #0f172a; }
+  .logo { font-size: 20px; font-weight: 800; color: #0f172a; }
   .logo span { color: #2563eb; }
-  .nav-links { display: flex; gap: 24px; font-size: 14px; font-weight: 600; color: #475569; }
+  .nav-links {
+    display: flex; gap: 16px; font-size: 13px; font-weight: 600;
+    color: #475569; flex-wrap: wrap; justify-content: center;
+  }
 
   .hero {
     background: linear-gradient(135deg, #0f172a, #1e3a8a);
-    color: #fff; text-align: center; padding: 70px 6% 90px; position: relative; overflow: hidden;
+    color: #fff; text-align: center; padding: 60px 6% 90px; position: relative; overflow: hidden;
   }
   .hero::before {
     content: "✈"; position: absolute; font-size: 300px; opacity: 0.06;
     right: -40px; top: -40px; transform: rotate(30deg);
   }
-  .hero h1 { font-size: 34px; font-weight: 800; max-width: 650px; margin: 0 auto 14px; line-height: 1.3; }
-  .hero p { color: #cbd5e1; max-width: 500px; margin: 0 auto 30px; font-size: 15px; }
+  .hero h1 { font-size: 30px; font-weight: 800; max-width: 650px; margin: 0 auto 14px; line-height: 1.3; position: relative; }
+  .hero p { color: #cbd5e1; max-width: 500px; margin: 0 auto 30px; font-size: 15px; position: relative; }
   .cta-btn {
     background: #2563eb; color: #fff; border: none; padding: 15px 34px;
     border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 10px 25px rgba(37,99,235,0.4);
+    box-shadow: 0 10px 25px rgba(37,99,235,0.4); position: relative;
   }
 
   .trust-bar {
@@ -85,13 +88,17 @@
 
 <nav>
   <div class="logo">Wing<span>back</span></div>
-  <div class="nav-links"><a href="#how">How it works</a><a href="#services">Your Rights</a><a href="#form">Check Claim</a></div>
+  <div class="nav-links">
+    <a href="#how">How It Works</a>
+    <a href="#services">Your Rights</a>
+    <a href="#form">Check My Claim</a>
+  </div>
 </nav>
 
 <div class="hero">
   <h1>Flight delayed, cancelled, or denied boarding?</h1>
   <p>You could be owed up to ₹20,000 per passenger under DGCA rules. We fight for it — you don't lift a finger.</p>
-  <button class="cta-btn" onclick="document.getElementById('form').scrollIntoView({behavior:'smooth'})">Check My Compensation</button>
+  <button class="cta-btn" type="button" id="scrollBtn">Check My Compensation</button>
 </div>
 
 <div class="trust-bar">
@@ -115,7 +122,7 @@
     <div class="service-card"><div class="service-icon">🛫</div><h4>Cancelled Flight</h4><p>Cancelled with less than 24 hours' notice? You may be owed ₹5,000–₹10,000.</p></div>
     <div class="service-card"><div class="service-icon">⏱</div><h4>Delayed Flight</h4><p>6+ hour delay entitles you to an alternate flight or full refund.</p></div>
     <div class="service-card"><div class="service-icon">🎫</div><h4>Denied Boarding</h4><p>Bumped due to overbooking? Compensation up to ₹20,000.</p></div>
-    <div class="service-card"><div class="service-icon">🧳</div><h4>Baggage Delay</h4><p>Lost or delayed baggage may qualify for separate compensation.</p></div>
+    <div class="service-card"><div class="service-icon">🧳</div><h4>Baggage Delay</h4><p>Lost or delayed baggage may qualify for compensation.</p></div>
   </div>
 </section>
 
@@ -139,6 +146,7 @@
       <option value="delay">Delayed</option>
       <option value="cancellation">Cancelled</option>
       <option value="denied_boarding">Denied Boarding</option>
+      <option value="baggage">Baggage Delay/Loss</option>
     </select>
     <input id="price" type="number" placeholder="Ticket Price (₹)" required>
     <button class="submit" type="submit">Check My Compensation</button>
@@ -151,6 +159,10 @@
 <script>
   const supabase = window.supabase.createClient("https://qdaaampcezgqfzfjikin.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYWFhbXBjZXpncWZ6Zmppa2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzE2NTksImV4cCI6MjEwNTkwNzY1OX0.pEWzMyDZFgcHbUSw3_bOvXUKX6C4icD6-pjlt_VsNKA");
 
+  document.getElementById("scrollBtn").addEventListener("click", function() {
+    document.getElementById("form").scrollIntoView({ behavior: "smooth" });
+  });
+
   function animateCount(id, target) {
     let el = document.getElementById(id), count = 0;
     const step = Math.max(1, Math.ceil(target / 60));
@@ -161,6 +173,7 @@
   function checkEligibility(eventType, price) {
     if (eventType === "cancellation") return { compensation: Math.min(Math.max(price * 0.5, 5000), 10000) };
     if (eventType === "denied_boarding") return { compensation: 20000 };
+    if (eventType === "baggage") return { compensation: 5000 };
     return { compensation: 0 };
   }
 
