@@ -4,14 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wingback</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: sans-serif; color: #1e293b; background: #f8fafc; }
-  nav { display: flex; flex-direction: column; align-items: center; padding: 14px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); gap: 8px; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 14px 5%; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 10; flex-wrap: wrap; gap: 10px; }
   .logo { font-size: 20px; font-weight: 800; }
   .logo span { color: #2563eb; }
-  .nav-links { display: flex; gap: 16px; font-size: 13px; font-weight: 600; }
+  .nav-links { display: flex; gap: 18px; font-size: 13px; font-weight: 600; flex-wrap: wrap; }
   .nav-links a { text-decoration: none; color: #475569; }
   .hero { background: #0f172a; color: #fff; text-align: center; padding: 60px 6% 90px; }
   .hero h1 { font-size: 28px; font-weight: 800; max-width: 600px; margin: 0 auto 14px; }
@@ -19,12 +18,16 @@
   .cta-btn { background: #2563eb; color: #fff; border: none; padding: 15px 34px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
   section { padding: 50px 6%; max-width: 900px; margin: 0 auto; }
   .section-title { text-align: center; font-size: 24px; font-weight: 800; margin-bottom: 30px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .service-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+  .fee-banner { background: #eff6ff; border-radius: 16px; padding: 26px; text-align: center; border: 1px solid #bfdbfe; }
   form { background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 440px; margin: 0 auto; }
   input, select { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
   button.submit { width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
   button.submit:disabled { background: #94a3b8; cursor: not-allowed; }
   #result { margin-top: 14px; text-align: center; font-weight: 700; color: #16a34a; }
   footer { background: #0f172a; color: #94a3b8; text-align: center; padding: 24px; font-size: 12px; }
+  footer a { color: #cbd5e1; text-decoration: none; margin: 0 6px; }
 </style>
 </head>
 <body>
@@ -32,6 +35,8 @@
 <nav>
   <div class="logo">Wing<span>back</span></div>
   <div class="nav-links">
+    <a href="#how">How It Works</a>
+    <a href="#services">Your Rights</a>
     <a href="#form">Check My Claim</a>
   </div>
 </nav>
@@ -41,6 +46,29 @@
   <p>You could be owed up to ₹20,000. We fight for it — you don't lift a finger.</p>
   <button class="cta-btn" type="button" id="scrollBtn">Check My Compensation</button>
 </div>
+
+<section id="how">
+  <div class="section-title">How it works</div>
+  <div class="cards">
+    <div class="service-card"><h4>1. Submit</h4><p>Takes under 2 minutes.</p></div>
+    <div class="service-card"><h4>2. We file</h4><p>We draft, send, and track your claim.</p></div>
+    <div class="service-card"><h4>3. Get paid</h4><p>Airline pays you. We take our fee after.</p></div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="section-title">What happened to your flight?</div>
+  <div class="cards">
+    <div class="service-card"><h4>Cancelled Flight</h4><p>Owed ₹5,000–10,000 if cancelled under 24hrs notice.</p></div>
+    <div class="service-card"><h4>Delayed Flight</h4><p>6+ hour delay = alternate flight or refund.</p></div>
+    <div class="service-card"><h4>Denied Boarding</h4><p>Bumped? Up to ₹20,000.</p></div>
+    <div class="service-card"><h4>Baggage Delay</h4><p>Lost/delayed baggage may qualify.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="fee-banner"><p>We only get paid when you do. Standard fee: <strong>15%</strong> of your compensation.</p></div>
+</section>
 
 <section id="form">
   <div class="section-title">Check Your Compensation</div>
@@ -64,8 +92,14 @@
   <div id="result"></div>
 </section>
 
-<footer>© 2026 Wingback</footer>
+<footer>
+  © 2026 Wingback ·
+  <a href="#terms">Terms</a> ·
+  <a href="#privacy">Privacy</a> ·
+  <a href="#contact">Contact</a>
+</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   document.getElementById("scrollBtn").addEventListener("click", function() {
     document.getElementById("form").scrollIntoView({ behavior: "smooth" });
@@ -95,7 +129,7 @@
     try {
       var client = window.supabase.createClient(
         "https://qdaaampcezgqfzfjikin.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYWFhbXBjZXpncWZ6Zmppa2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzE2NTksImV4cCI6MjEwNTkwNzY1OX0.pEWzMyDZFgcHbUSw3_bOvXUKX6C4icD6-pjlt_VsNKA;
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYWFhbXBjZXpncWZ6Zmppa2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzE2NTksImV4cCI6MjEwNTkwNzY1OX0.pEWzMyDZFgcHbUSw3_bOvXUKX6C4icD6-pjlt_VsNKA"
       );
       await client.from("claims").insert({
         passenger_name: document.getElementById("name").value,
