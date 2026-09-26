@@ -37,7 +37,7 @@ def process_new_claims():
         deadline = (datetime.now() + timedelta(days=15)).strftime("%Y-%m-%d")
 
         resend.Emails.send({
-            "from": "claims@wingback.in",
+            "from": "onboarding@resend.dev",
             "to": row["email"],
             "subject": "Your claim letter is ready",
             "text": letter
