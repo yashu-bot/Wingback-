@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wingback</title>
+<title>Wingback — Flight Compensation Made Simple</title>
+<meta name="description" content="Get compensation for delayed, cancelled, or overbooked flights in India. Free eligibility check, no win no fee. DGCA-compliant claims.">
+<meta name="keywords" content="flight compensation India, DGCA flight delay claim, IndiGo cancelled flight compensation, flight cancellation refund">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: sans-serif; color: #1e293b; background: #f8fafc; }
@@ -23,11 +26,14 @@
   .fee-banner { background: #eff6ff; border-radius: 16px; padding: 26px; text-align: center; border: 1px solid #bfdbfe; }
   form { background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 440px; margin: 0 auto; }
   input, select { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
+  #flightStatus { font-size: 13px; color: #0891b2; margin-bottom: 12px; min-height: 16px; }
+  .verify-btn { width: 100%; padding: 10px; background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; border-radius: 8px; font-weight: 700; cursor: pointer; margin-bottom: 8px; }
   button.submit { width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
   button.submit:disabled { background: #94a3b8; cursor: not-allowed; }
   #result { margin-top: 14px; text-align: center; font-weight: 700; color: #16a34a; }
   footer { background: #0f172a; color: #94a3b8; text-align: center; padding: 24px; font-size: 12px; }
   footer a { color: #cbd5e1; text-decoration: none; margin: 0 6px; }
+  .wa-btn { position: fixed; bottom: 20px; right: 20px; background: #25D366; color: #fff; padding: 12px 18px; border-radius: 30px; text-decoration: none; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 30; }
 </style>
 </head>
 <body>
@@ -78,6 +84,8 @@
     <input id="phone" placeholder="Phone">
     <input id="pnr" placeholder="PNR Number" required>
     <input id="flight" placeholder="Flight Number" required>
+    <button type="button" class="verify-btn" onclick="verifyFlight()">Verify Flight Status</button>
+    <div id="flightStatus"></div>
     <input id="airline" placeholder="Airline" required>
     <input id="date" type="date" required>
     <select id="event">
@@ -99,11 +107,41 @@
   <a href="#contact">Contact</a>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<a class="wa-btn" href="https://wa.me/91XXXXXXXXXX" target="_blank">💬 WhatsApp Us</a>
+
 <script>
   document.getElementById("scrollBtn").addEventListener("click", function() {
     document.getElementById("form").scrollIntoView({ behavior: "smooth" });
   });
+
+  async function verifyFlight() {
+    const flightNo = document.getElementById("flight").value;
+    const date = document.getElementById("date").value;
+    if (!flightNo || !date) {
+      document.getElementById("flightStatus").innerText = "Enter flight number and date first.";
+      return;
+    }
+    try {
+      const response = await fetch(
+        `https://aerodatabox.p.rapidapi.com/flights/number/${flightNo}/${date}`,
+        {
+          headers: {
+            "X-RapidAPI-Key": "PASTE_YOUR_AERODATABOX_KEY",
+            "X-RapidAPI-Host": "aerodatabox.p.rapidapi.com"
+          }
+        }
+      );
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const status = data[0].status || "Unknown";
+        document.getElementById("flightStatus").innerText = "Verified status: " + status;
+      } else {
+        document.getElementById("flightStatus").innerText = "Couldn't verify — you can still proceed if you have your booking confirmation.";
+      }
+    } catch (err) {
+      document.getElementById("flightStatus").innerText = "Verification unavailable right now — proceed with your details.";
+    }
+  }
 
   function checkEligibility(eventType, price) {
     if (eventType === "cancellation") return Math.min(Math.max(price * 0.5, 5000), 10000);
