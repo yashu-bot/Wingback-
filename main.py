@@ -6,6 +6,13 @@ import resend
 supabase = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_KEY"])
 resend.api_key = os.environ["RESEND_API_KEY"]
 
+AIRLINE_CONTACTS = {
+    "SpiceJet": "nodalofficer@spicejet.com",
+    "IndiGo": "admin@indigo.in",
+    "Air India": "nodalofficer@airindia.com",
+    "Akasa Air": "nodalofficer@akasaair.com",
+}
+
 def generate_claim_letter(row):
     entitlements = {
         "cancellation": f"Compensation of ~₹{row['compensation']}, alternate flight or full refund",
@@ -36,10 +43,21 @@ def process_new_claims():
         letter = generate_claim_letter(row)
         deadline = (datetime.now() + timedelta(days=15)).strftime("%Y-%m-%d")
 
+        airline_email = AIRLINE_CONTACTS.get(row["airline"])
+
+        if airline_email:
+            recipient = airline_email
+            cc_list = [row["email"]]
+        else:
+            recipient = row["email"]
+            cc_list = []
+            print(f"No verified email for airline '{row['airline']}' — sent to customer only for manual forwarding.")
+
         resend.Emails.send({
             "from": "claims@mail.wingback.prepvida.in",
-            "to": row["email"],
-            "subject": "Your claim letter is ready",
+            "to": recipient,
+            "cc": cc_list,
+            "subject": f"Compensation Claim — PNR {row['pnr']}",
             "text": letter
         })
 
