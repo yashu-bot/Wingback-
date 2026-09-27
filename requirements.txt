@@ -1,4 +1,4 @@
 supabase
 resend
-anthropic
+google-generativeai
 requests
