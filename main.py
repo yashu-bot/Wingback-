@@ -1,14 +1,13 @@
 import os
-import base64
 import requests as req
 from supabase import create_client
 from datetime import datetime, timedelta
 import resend
-import anthropic
+import google.generativeai as genai
 
 supabase = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_KEY"])
 resend.api_key = os.environ["RESEND_API_KEY"]
-client_ai = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 AIRLINE_CONTACTS = {
     "SpiceJet": "nodalofficer@spicejet.com",
@@ -45,22 +44,15 @@ def verify_booking_proof(row):
     if not row.get("booking_proof_url"):
         return "no_proof_uploaded"
     try:
-        image_data = base64.b64encode(req.get(row["booking_proof_url"]).content).decode()
-        response = client_ai.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=200,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": image_data}},
-                    {"type": "text", "text": f"""This should be a flight booking confirmation. 
-                    Check if PNR '{row['pnr']}', flight '{row['flight_no']}', and date '{row['travel_date']}' 
-                    appear to match what's visible in the image. Respond with exactly one word: 
-                    MATCH, MISMATCH, or UNCLEAR."""}
-                ]
-            }]
-        )
-        return response.content[0].text.strip()
+        image_data = req.get(row["booking_proof_url"]).content
+        model = genai.GenerativeModel("gemini-2.0-flash")
+        response = model.generate_content([
+            {"mime_type": "image/jpeg", "data": image_data},
+            f"""This should be a flight booking confirmation. Check if PNR '{row['pnr']}', 
+            flight '{row['flight_no']}', and date '{row['travel_date']}' appear to match 
+            what's visible in the image. Respond with exactly one word: MATCH, MISMATCH, or UNCLEAR."""
+        ])
+        return response.text.strip()
     except Exception as e:
         print(f"Verification error: {e}")
         return "verification_failed"
