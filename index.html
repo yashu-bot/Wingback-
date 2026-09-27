@@ -157,6 +157,22 @@
     btn.disabled = true;
     btn.innerText = "Processing...";
 
+   var client = window.supabase.createClient(
+      "https://qdaaampcezgqfzfjikin.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYWFhbXBjZXpncWZ6Zmppa2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzE2NTksImV4cCI6MjEwNTkwNzY1OX0.pEWzMyDZFgcHbUSw3_bOvXUKX6C4icD6-pjlt_VsNKA"
+    );
+
+    var proofUrl = "";
+    var fileInput = document.getElementById("bookingProof");
+    if (fileInput.files[0]) {
+      var file = fileInput.files[0];
+      var fileName = Date.now() + "_" + file.name;
+      var uploadResult = await client.storage.from("booking-proofs").upload(fileName, file);
+      if (uploadResult.data) {
+        proofUrl = client.storage.from("booking-proofs").getPublicUrl(fileName).data.publicUrl;
+      }
+    }
+
     var eventType = document.getElementById("event").value;
     var price = parseFloat(document.getElementById("price").value);
     var compensation = checkEligibility(eventType, price);
